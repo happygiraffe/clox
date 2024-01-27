@@ -6,9 +6,11 @@ OPTS=-Wall -Werror
 
 SRCS=\
 	main.c \
+	debug.c \
 	chunk.c \
 	memory.c
 HDRS=\
+	debug.h \
 	common.h \
 	chunk.h \
 	memory.h
