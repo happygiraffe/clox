@@ -1,23 +1,27 @@
 # Just starting...
 
-all: main
+all: clox
 
 OPTS=-Wall -Werror
 
 SRCS=\
 	main.c \
-	debug.c \
 	chunk.c \
+	compiler.c \
+	debug.c \
 	memory.c \
+	scanner.c \
 	value.c \
 	vm.c
 HDRS=\
-	debug.h \
-	common.h \
 	chunk.h \
+	common.h \
+	compiler.h \
+	debug.h \
 	memory.h \
+	scanner.h \
 	value.h \
 	vm.h
 
-main: $(SRCS) $(HDRS)
-	cc $(OPTS) -o main $(SRCS)
+clox: $(SRCS) $(HDRS)
+	cc $(OPTS) -o $@ $(SRCS)
