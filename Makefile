@@ -9,13 +9,15 @@ SRCS=\
 	debug.c \
 	chunk.c \
 	memory.c \
-	value.c
+	value.c \
+	vm.c
 HDRS=\
 	debug.h \
 	common.h \
 	chunk.h \
 	memory.h \
-	value.h
+	value.h \
+	vm.h
 
 main: $(SRCS) $(HDRS)
 	cc $(OPTS) -o main $(SRCS)

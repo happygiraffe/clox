@@ -5,4 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* When defined, print each instruction prior to execution. */
+#define DEBUG_TRACE_EXECUTION
+
 #endif
