@@ -7,12 +7,30 @@
 /* A single shared instance 😭 */
 VM vm;
 
+static void resetStack()
+{
+    vm.stackTop = vm.stack;
+}
+
 void initVM()
 {
+    resetStack();
 }
 
 void freeVM()
 {
+}
+
+void push(Value value)
+{
+    *vm.stackTop = value;
+    vm.stackTop++; /* overflow schmoverflow! */
+}
+
+Value pop()
+{
+    vm.stackTop--;
+    return *vm.stackTop; /* underflow schmunderflow! 🤦 */
 }
 
 static InterpretResult run()
@@ -22,6 +40,14 @@ static InterpretResult run()
     for (;;)
     {
 #ifdef DEBUG_TRACE_EXECUTION
+        printf("\t\t");
+        for (Value *slot = vm.stack; slot < vm.stackTop; slot++)
+        {
+            printf("[ ");
+            printValue(*slot);
+            printf(" ]");
+        }
+        printf("\n");
         disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
         uint8_t instruction;
@@ -30,11 +56,12 @@ static InterpretResult run()
         case OP_CONSTANT:
         {
             Value constant = READ_CONSTANT();
-            printValue(constant);
-            printf("\n");
+            push(constant);
             break;
         }
         case OP_RETURN:
+            printValue(pop());
+            printf("\n");
             return INTERPRET_OK;
         }
     }
