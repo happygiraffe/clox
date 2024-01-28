@@ -6,7 +6,7 @@
 
 #define STACK_MAX 256
 
-typedef struct
+typedef struct VM
 {
     Chunk *chunk;
     uint8_t *ip; /* always points to the _next_ instruction to be executed */
@@ -14,7 +14,7 @@ typedef struct
     Value *stackTop; /* where to push the next value */
 } VM;
 
-typedef enum
+typedef enum InterpretResult
 {
     INTERPRET_OK,
     INTERPRET_COMPILE_ERROR,
