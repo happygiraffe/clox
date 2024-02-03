@@ -18,7 +18,7 @@ typedef enum InterpretResult
 {
     INTERPRET_OK,
     INTERPRET_COMPILE_ERROR,
-    INTERPRE_RUNTIME_ERROR
+    INTERPRET_RUNTIME_ERROR
 } InterpretResult;
 
 void initVM();
