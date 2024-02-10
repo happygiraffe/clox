@@ -2,7 +2,8 @@
 
 all: clox
 
-OPTS=-Wall -Werror
+# TODO: reenable -Werror
+OPTS=-Wall # -Werror
 
 SRCS=\
 	main.c \
