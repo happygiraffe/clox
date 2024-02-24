@@ -66,7 +66,7 @@ static void errorAt(Token *token, const char *message)
         fprintf(stderr, " at '%.*s'", token->length, token->start);
     }
 
-    fprintf(stderr, ": %s", message);
+    fprintf(stderr, ": %s\n", message);
     parser.hadError = true;
 }
 
@@ -139,7 +139,8 @@ static void endCompiler()
 {
     emitReturn();
 #ifdef DEBUG_PRINT_CODE
-    if (!parser.hadError) {
+    if (!parser.hadError)
+    {
         disassembleChunk(currentChunk(), "code");
     }
 #endif
@@ -211,11 +212,11 @@ ParseRule rules[] = {
     [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
     [TOKEN_DOT] = {NULL, NULL, PREC_NONE},
-    [TOKEN_MINUS] = {unary, binary, PREC_NONE},
-    [TOKEN_PLUS] = {NULL, binary, PREC_NONE},
+    [TOKEN_MINUS] = {unary, binary, PREC_TERM},
+    [TOKEN_PLUS] = {NULL, binary, PREC_TERM},
     [TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
-    [TOKEN_SLASH] = {NULL, binary, PREC_NONE},
-    [TOKEN_STAR] = {NULL, binary, PREC_NONE},
+    [TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
+    [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
     [TOKEN_BANG] = {NULL, NULL, PREC_NONE},
     [TOKEN_BANG_EQUAL] = {NULL, NULL, PREC_NONE},
     [TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
@@ -251,15 +252,17 @@ static void parsePrecedence(Precedence precedence)
 {
     advance();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
-    if (prefixRule == NULL) {
+    if (prefixRule == NULL)
+    {
         error("Expect expression.");
         return;
     }
     prefixRule();
 
-    while (precedence <= getRule(parser.current.type)->precedence) {
+    while (precedence <= getRule(parser.current.type)->precedence)
+    {
         advance();
-        ParseFn infixRule = getRule(parser.previous.type)->prefix;
+        ParseFn infixRule = getRule(parser.previous.type)->infix;
         infixRule();
     }
 }
