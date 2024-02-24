@@ -41,6 +41,9 @@ void printValue(Value value)
     case VAL_NUMBER:
         printf("%g", AS_NUMBER(value));
         break;
+    case VAL_OBJ:
+        printf("TODO: implement strings");
+        break;
     }
 }
 
@@ -56,6 +59,8 @@ bool valuesEqual(Value a, Value b)
         return true;
     case VAL_NUMBER:
         return AS_NUMBER(a) == AS_NUMBER(b);
+    case VAL_OBJ:
+        return false; // TODO: implement
     default:
         return false; // unreachable
     }

@@ -20,6 +20,7 @@ HDRS=\
 	compiler.h \
 	debug.h \
 	memory.h \
+	object.h \
 	scanner.h \
 	value.h \
 	vm.h
