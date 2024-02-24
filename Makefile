@@ -11,6 +11,7 @@ SRCS=\
 	compiler.c \
 	debug.c \
 	memory.c \
+	object.c \
 	scanner.c \
 	value.c \
 	vm.c
