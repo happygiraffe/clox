@@ -132,7 +132,7 @@ static uint8_t makeConstant(Value value)
 
 static void emitConstant(Value value)
 {
-    emiteBytes(OP_CONSTANT, makeConstant(value));
+    emitBytes(OP_CONSTANT, makeConstant(value));
 }
 
 static void endCompiler()
