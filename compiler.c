@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "compiler.h"
+#include "debug.h"
 #include "scanner.h"
 
 typedef struct Parser
@@ -137,6 +138,11 @@ static void emitConstant(Value value)
 static void endCompiler()
 {
     emitReturn();
+#ifdef DEBUG_PRINT_CODE
+    if (!parser.hadError) {
+        disassembleChunk(currentChunk(), "code");
+    }
+#endif
 }
 
 // forward declarations
