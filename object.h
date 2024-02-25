@@ -28,6 +28,9 @@ struct ObjString
     char *chars;
 };
 
+// Builds a string and takes ownership of the memory passed in.
+ObjString *takeString(char *chars, int length);
+// Builds a string by copying the supplied memory.
 ObjString *copyString(const char *chars, int length);
 void printObject(Value value);
 
