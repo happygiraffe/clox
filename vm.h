@@ -3,6 +3,7 @@
 
 #include "chunk.h"
 #include "value.h"
+#include "table.h"
 
 #define STACK_MAX 256
 
@@ -12,6 +13,7 @@ typedef struct VM
     uint8_t *ip; /* always points to the _next_ instruction to be executed */
     Value stack[STACK_MAX];
     Value *stackTop; /* where to push the next value */
+    Table strings;
     Obj *objects;
 } VM;
 
