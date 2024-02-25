@@ -19,6 +19,7 @@ typedef enum ObjType
 struct Obj
 {
     ObjType type;
+    struct Obj *next; // linked list of all objects for GC
 };
 
 struct ObjString
