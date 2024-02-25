@@ -13,6 +13,7 @@ SRCS=\
 	memory.c \
 	object.c \
 	scanner.c \
+	table.c \
 	value.c \
 	vm.c
 HDRS=\
@@ -23,6 +24,7 @@ HDRS=\
 	memory.h \
 	object.h \
 	scanner.h \
+	table.h \
 	value.h \
 	vm.h
 

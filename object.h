@@ -27,6 +27,7 @@ struct ObjString
     Obj obj;
     int length;
     char *chars;
+    uint32_t hash;
 };
 
 // Builds a string and takes ownership of the memory passed in.
