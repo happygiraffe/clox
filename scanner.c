@@ -121,7 +121,7 @@ static TokenType checkKeyword(int start, int length, const char *rest, TokenType
     {
         return type;
     }
-    return TOKEN_IDENTIFER;
+    return TOKEN_IDENTIFIER;
 }
 
 static TokenType identifierType()
@@ -178,7 +178,7 @@ static TokenType identifierType()
     case 'w':
         return checkKeyword(1, 4, "hile", TOKEN_WHILE);
     }
-    return TOKEN_IDENTIFER;
+    return TOKEN_IDENTIFIER;
 }
 
 static Token identifier()
