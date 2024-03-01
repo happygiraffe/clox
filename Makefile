@@ -30,3 +30,6 @@ HDRS=\
 
 clox: $(SRCS) $(HDRS)
 	cc $(OPTS) -o $@ $(SRCS)
+
+clean:
+	rm -f clox
