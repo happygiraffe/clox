@@ -13,6 +13,7 @@ typedef struct VM
     uint8_t *ip; /* always points to the _next_ instruction to be executed */
     Value stack[STACK_MAX];
     Value *stackTop; /* where to push the next value */
+    Table globals;
     Table strings;
     Obj *objects;
 } VM;
