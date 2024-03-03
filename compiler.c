@@ -7,13 +7,7 @@
 #include "object.h"
 #include "scanner.h"
 
-typedef struct Parser
-{
-    Token current;
-    Token previous;
-    bool hadError;
-    bool panicMode;
-} Parser;
+typedef void (*ParseFn)(bool canAssign);
 
 typedef enum Precedence
 {
@@ -30,8 +24,6 @@ typedef enum Precedence
     PREC_PRIMARY
 } Precedence;
 
-typedef void (*ParseFn)(bool canAssign);
-
 typedef struct ParseRule
 {
     ParseFn prefix;
@@ -39,8 +31,30 @@ typedef struct ParseRule
     Precedence precedence;
 } ParseRule;
 
+typedef struct Local
+{
+    Token name;
+    int depth;
+} Local;
+
+typedef struct Compiler
+{
+    Local locals[UINT8_COUNT];
+    int localCount;
+    int scopeDepth;
+} Compiler;
+
+typedef struct Parser
+{
+    Token current;
+    Token previous;
+    bool hadError;
+    bool panicMode;
+} Parser;
+
 // Global variables. 😭
 Parser parser;
+Compiler *current = NULL;
 Chunk *compilingChunk;
 
 static Chunk *currentChunk()
@@ -147,6 +161,13 @@ static uint8_t makeConstant(Value value)
 static void emitConstant(Value value)
 {
     emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
+static void initCompiler(Compiler *compiler)
+{
+    compiler->localCount = 0;
+    compiler->scopeDepth = 0;
+    current = compiler;
 }
 
 static void endCompiler()
@@ -465,6 +486,8 @@ static void declaration()
 bool compile(const char *source, Chunk *chunk)
 {
     initScanner(source);
+    Compiler compiler;
+    initCompiler(&compiler);
     compilingChunk = chunk;
 
     parser.hadError = false;
