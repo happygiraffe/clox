@@ -1,19 +1,23 @@
 #ifndef clox_object_h
 #define clox_object_h
 
+#include "chunk.h"
 #include "common.h"
 #include "value.h"
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
 
+#define IS_FUNCTION(value) isObjType(value, OBJ_FUNCTION)
 #define IS_STRING(value) isObjType(value, OBJ_STRING)
 
+#define AS_FUNCTION(value) ((ObjFunction *)AS_OBJ(value))
 #define AS_STRING(value) ((ObjString *)AS_OBJ(value))
 #define AS_CSTRING(value) (((ObjString *)AS_OBJ(value))->chars)
 
 typedef enum ObjType
 {
     OBJ_STRING,
+    OBJ_FUNCTION,
 } ObjType;
 
 struct Obj
@@ -21,6 +25,14 @@ struct Obj
     ObjType type;
     struct Obj *next; // linked list of all objects for GC
 };
+
+typedef struct ObjFunction
+{
+    Obj obj;
+    int arity;
+    Chunk chunk;
+    ObjString *name;
+} ObjFunction;
 
 struct ObjString
 {
@@ -30,6 +42,7 @@ struct ObjString
     uint32_t hash;
 };
 
+ObjFunction *newFunction();
 // Builds a string and takes ownership of the memory passed in.
 ObjString *takeString(char *chars, int length);
 // Builds a string by copying the supplied memory.
