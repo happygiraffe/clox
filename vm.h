@@ -3,14 +3,24 @@
 
 #include "chunk.h"
 #include "value.h"
+#include "object.h"
 #include "table.h"
 
-#define STACK_MAX 256
+#define FRAMES_MAX 64
+#define STACK_MAX (FRAMES_MAX * UINT8_COUNT)
+
+typedef struct CallFrame
+{
+    ObjFunction *function;
+    uint8_t *ip;
+    Value *slots; // points into the value stack; treated like an array
+} CallFrame;
 
 typedef struct VM
 {
-    Chunk *chunk;
-    uint8_t *ip; /* always points to the _next_ instruction to be executed */
+    CallFrame frames[FRAMES_MAX];
+    int frameCount;
+
     Value stack[STACK_MAX];
     Value *stackTop; /* where to push the next value */
     Table globals;
