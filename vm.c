@@ -271,6 +271,7 @@ static void concatenate()
 #undef READ_CONSTANT
 #undef READ_STRING
 #undef READ_BYTE
+#undef READ_SHORT
 }
 
 InterpretResult interpret(const char *source)
