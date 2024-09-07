@@ -176,6 +176,7 @@ static int emitJump(uint8_t instruction)
 
 static void emitReturn()
 {
+    emitByte(OP_NIL); // default return value
     emitByte(OP_RETURN);
 }
 
@@ -216,7 +217,8 @@ static void initCompiler(Compiler *compiler, FunctionType type)
     compiler->scopeDepth = 0;
     compiler->function = newFunction();
     current = compiler;
-    if (type != TYPE_SCRIPT) {
+    if (type != TYPE_SCRIPT)
+    {
         current->function->name = copyString(parser.previous.start, parser.previous.length);
     }
 
@@ -271,6 +273,8 @@ static void parsePrecedence(Precedence precedence);
 static uint8_t identifierConstant(Token *name);           // TODO: this isn't the book, I've misplaced something
 static int resolveLocal(Compiler *compiler, Token *name); // TODO: misplaced
 static void and_(bool canAssign);                         // TODO: misplaced
+static void call(bool canAssign);                         // TODO: misplaced
+static uint8_t argumentList();                            // TODO: misplaced
 
 static void binary(bool canAssign)
 {
@@ -312,6 +316,12 @@ static void binary(bool canAssign)
     default:
         return; // unreachable
     }
+}
+
+static void call(bool canAssign)
+{
+    uint8_t argCount = argumentList();
+    emitBytes(OP_CALL, argCount);
 }
 
 static void literal(bool canAssign)
@@ -416,7 +426,7 @@ static void unary(bool canAssign)
 }
 
 ParseRule rules[] = {
-    [TOKEN_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
+    [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
@@ -570,6 +580,25 @@ static void defineVariable(uint8_t global)
         return;
     }
     emitBytes(OP_DEFINE_GLOBAL, global);
+}
+
+static uint8_t argumentList()
+{
+    uint8_t argCount = 0;
+    if (!check(TOKEN_RIGHT_PAREN))
+    {
+        do
+        {
+            expression();
+            if (argCount == UINT8_MAX)
+            {
+                error("Can't have more than 255 arguments");
+            }
+            argCount++;
+        } while (match(TOKEN_COMMA));
+    }
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
+    return argCount;
 }
 
 static void and_(bool canAssign)
