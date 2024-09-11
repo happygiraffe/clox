@@ -871,7 +871,7 @@ static void declaration()
     {
         funDeclaration();
     }
-    if (match(TOKEN_VAR))
+    else if (match(TOKEN_VAR))
     {
         varDeclaration();
     }
