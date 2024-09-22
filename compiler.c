@@ -673,7 +673,7 @@ static void function(FunctionType type)
 
     // As we end the compiler here, we don't need to explicitly end the scope.
     ObjFunction *function = endCompiler();
-    emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
+    emitBytes(OP_CLOSURE, makeConstant(OBJ_VAL(function)));
 }
 
 static void funDeclaration()

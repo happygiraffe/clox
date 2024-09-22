@@ -11,7 +11,7 @@
 
 typedef struct CallFrame
 {
-    ObjFunction *function;
+    ObjClosure *closure;
     uint8_t *ip;
     Value *slots; // points into the value stack; treated like an array
 } CallFrame;

@@ -20,6 +20,12 @@ static void freeObject(Obj *object)
 {
     switch (object->type)
     {
+    case OBJ_CLOSURE:
+    {
+        // Only free the closure itself: we don't own the referenced function.
+        FREE(ObjClosure, object);
+        break;
+    }
     case OBJ_FUNCTION:
     {
       ObjFunction *function = (ObjFunction *)object;
