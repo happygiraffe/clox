@@ -1,0 +1,11 @@
+// 25.5 example: "should print outer"...
+
+var x = "global";
+fun outer () {
+    var x = "outer";
+    fun inner () {
+        print x;
+    }
+    inner ();
+}
+outer();
