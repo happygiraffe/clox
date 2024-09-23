@@ -23,6 +23,8 @@ static void freeObject(Obj *object)
     case OBJ_CLOSURE:
     {
         // Only free the closure itself: we don't own the referenced function.
+        ObjClosure *closure = (ObjClosure *)object;
+        FREE_ARRAY(ObjUpvalue *, closure->upvalues, closure->upvalueCount);
         FREE(ObjClosure, object);
         break;
     }
@@ -35,6 +37,10 @@ static void freeObject(Obj *object)
     }
     case OBJ_NATIVE:
         FREE(ObjNative, object);
+        break;
+    case OBJ_UPVALUE:
+        FREE(ObjUpvalue, object);
+        // The upvalue does not own the referenced variable.
         break;
     case OBJ_STRING:
     {
