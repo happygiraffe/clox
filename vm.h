@@ -25,6 +25,7 @@ typedef struct VM
     Value *stackTop; /* where to push the next value */
     Table globals;
     Table strings;
+    ObjUpvalue *openUpvalues;
     Obj *objects;
 } VM;
 

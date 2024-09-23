@@ -62,6 +62,9 @@ typedef struct ObjUpvalue
 {
     Obj obj;
     Value *location; // NB: points to the real value!
+    Value closed;    // The value being closed over
+    struct ObjUpvalue *next; // linked list
+
 } ObjUpvalue;
 
 typedef struct ObjClosure
