@@ -52,7 +52,7 @@ void markObject(Obj *object)
         vm.grayCapacity = GROW_CAPACITY(vm.grayCapacity);
         // NOTE: system realloc, not ours!
         vm.grayStack = (Obj **)realloc(vm.grayStack, sizeof(Obj *) * vm.grayCapacity);
-        if (vm.grayStack = NULL)
+        if (vm.grayStack == NULL)
             exit(1);
     }
     // Mark this object as seen.
@@ -87,6 +87,7 @@ static void blackenObject(Obj *object)
     switch (object->type)
     {
     case OBJ_CLOSURE:
+    {
         ObjClosure *closure = (ObjClosure *)object;
         markObject((Obj *)closure->function);
         for (int i = 0; i < closure->upvalueCount; i++)
@@ -94,11 +95,14 @@ static void blackenObject(Obj *object)
             markObject((Obj *)closure->upvalues[i]);
         }
         break;
+    }
     case OBJ_FUNCTION:
+    {
         ObjFunction *function = (ObjFunction *)object;
         markObject((Obj *)function->name);
         markArray(&function->chunk.constants);
         break;
+    }
     case OBJ_UPVALUE:
         markValue(((ObjUpvalue *)object)->closed);
         break;
