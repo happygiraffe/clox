@@ -188,6 +188,31 @@ static void traceReferences()
     }
 }
 
+static void sweep()
+{
+    Obj *previous = NULL;
+    Obj *object = vm.objects;
+    while (object != NULL)
+    {
+        if (object->isMarked)
+        {
+            object->isMarked = false; // for the next cycle
+            previous = object;
+            object = object->next;
+        }
+        else
+        {
+            Obj *unreached = object;
+            object = object->next;
+            if (previous != NULL)
+                previous->next = object;
+            else
+                vm.objects = object;
+            freeObject(unreached);
+        }
+    }
+}
+
 void collectGarbage()
 {
 #ifdef DEBUG_LOG_GC
@@ -196,6 +221,10 @@ void collectGarbage()
 
     markRoots();
     traceReferences();
+    // Interned strings need special treatment. They're not a root, but if we
+    // spot an unused entry it needs to be removed.
+    tableRemoveWhite(&vm.strings);
+    sweep();
 
 #ifdef DEBUG_LOG_GC
     printf("-- gc end\n");
