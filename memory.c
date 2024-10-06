@@ -6,6 +6,15 @@
 
 void *reallocate(void *pointer, size_t oldSize, size_t newSize)
 {
+    if (newSize > oldSize)
+    {
+        // We know we need some more memory so this is a good place to test the
+        // GC.
+#ifdef DEBUG_STRESS_GC
+        collectGarbage();
+#endif
+    }
+
     if (newSize == 0)
     {
         free(pointer);
@@ -50,6 +59,10 @@ static void freeObject(Obj *object)
         break;
     }
     }
+}
+
+void collectGarbage()
+{
 }
 
 void freeObjects()

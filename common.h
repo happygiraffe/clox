@@ -10,6 +10,9 @@
 /* When defined, print each instruction prior to execution. */
 #define DEBUG_TRACE_EXECUTION
 
+/* When defined, stress test the garbage collector. */
+#define DEBUG_STRESS_GC
+
 #define UINT8_COUNT (UINT8_MAX + 1)
 
 #endif
