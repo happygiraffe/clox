@@ -35,12 +35,28 @@ void markObject(Obj *object)
 {
     if (object == NULL)
         return;
+    if (object->isMarked)
+        return;
+
 #ifdef DEBUG_LOG_GC
     printf("%p mark ", (void *)object);
     printValue(OBJ_VAL(object));
     printf("\n");
 #endif
+
     object->isMarked = true;
+
+    // Ensure we have enough space to track gray objects.
+    if (vm.grayCapacity < vm.grayCount + 1)
+    {
+        vm.grayCapacity = GROW_CAPACITY(vm.grayCapacity);
+        // NOTE: system realloc, not ours!
+        vm.grayStack = (Obj **)realloc(vm.grayStack, sizeof(Obj *) * vm.grayCapacity);
+        if (vm.grayStack = NULL)
+            exit(1);
+    }
+    // Mark this object as seen.
+    vm.grayStack[vm.grayCount++] = object;
 }
 
 void markValue(Value value)
@@ -50,6 +66,46 @@ void markValue(Value value)
 
     if (IS_OBJ(value))
         markObject(AS_OBJ(value));
+}
+
+static void markArray(ValueArray *array)
+{
+    for (int i = 0; i < array->count; i++)
+    {
+        markValue(array->values[i]);
+    }
+}
+
+static void blackenObject(Obj *object)
+{
+#ifdef DEBUG_LOG_GC
+    printf("%p blacken ", (void *)object);
+    printValue(OBJ_VAL(object));
+    printf("\n");
+#endif
+
+    switch (object->type)
+    {
+    case OBJ_CLOSURE:
+        ObjClosure *closure = (ObjClosure *)object;
+        markObject((Obj *)closure->function);
+        for (int i = 0; i < closure->upvalueCount; i++)
+        {
+            markObject((Obj *)closure->upvalues[i]);
+        }
+        break;
+    case OBJ_FUNCTION:
+        ObjFunction *function = (ObjFunction *)object;
+        markObject((Obj *)function->name);
+        markArray(&function->chunk.constants);
+        break;
+    case OBJ_UPVALUE:
+        markValue(((ObjUpvalue *)object)->closed);
+        break;
+    case OBJ_NATIVE:
+    case OBJ_STRING:
+        break;
+    }
 }
 
 static void freeObject(Obj *object)
@@ -119,6 +175,15 @@ static void markRoots()
     markCompilerRoots();
 }
 
+static void traceReferences()
+{
+    while (vm.grayCount > 0)
+    {
+        Obj *object = vm.grayStack[--vm.grayCount];
+        blackenObject(object);
+    }
+}
+
 void collectGarbage()
 {
 #ifdef DEBUG_LOG_GC
@@ -126,6 +191,7 @@ void collectGarbage()
 #endif
 
     markRoots();
+    traceReferences();
 
 #ifdef DEBUG_LOG_GC
     printf("-- gc end\n");
@@ -141,4 +207,6 @@ void freeObjects()
         freeObject(object);
         object = next;
     }
+
+    free(vm.grayStack);
 }
