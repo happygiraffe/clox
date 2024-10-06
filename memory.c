@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "compiler.h"
 #include "memory.h"
 #include "vm.h"
 
@@ -30,6 +31,27 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize)
     return ret;
 }
 
+void markObject(Obj *object)
+{
+    if (object == NULL)
+        return;
+#ifdef DEBUG_LOG_GC
+    printf("%p mark ", (void *)object);
+    printValue(OBJ_VAL(object));
+    printf("\n");
+#endif
+    object->isMarked = true;
+}
+
+void markValue(Value value)
+{
+    // some values (e.g. numbers, bools) are stored inline in Value and don't
+    // need heap allocation.
+
+    if (IS_OBJ(value))
+        markObject(AS_OBJ(value));
+}
+
 static void freeObject(Obj *object)
 {
 #ifdef DEBUG_LOG_GC
@@ -48,10 +70,10 @@ static void freeObject(Obj *object)
     }
     case OBJ_FUNCTION:
     {
-      ObjFunction *function = (ObjFunction *)object;
-      freeChunk(&function->chunk);
-      FREE(ObjFunction, function);
-      break;
+        ObjFunction *function = (ObjFunction *)object;
+        freeChunk(&function->chunk);
+        FREE(ObjFunction, function);
+        break;
     }
     case OBJ_NATIVE:
         FREE(ObjNative, object);
@@ -70,11 +92,40 @@ static void freeObject(Obj *object)
     }
 }
 
+static void markRoots()
+{
+    // The stack is the first reachability root.
+    for (Value *slot = vm.stack; slot < vm.stackTop; slot++)
+    {
+        markValue(*slot);
+    }
+
+    // Look in closures.
+    for (int i = 0; i < vm.frameCount; i++)
+    {
+        markObject((Obj *)vm.frames[i].closure);
+    }
+
+    // And in upvalues.
+    for (ObjUpvalue *upvalue = vm.openUpvalues; upvalue != NULL; upvalue = upvalue->next)
+    {
+        markObject((Obj *)upvalue);
+    }
+
+    // And in global variables.
+    markTable(&vm.globals);
+
+    // Finally look in the compiler's usage.
+    markCompilerRoots();
+}
+
 void collectGarbage()
 {
 #ifdef DEBUG_LOG_GC
     printf("-- gc begin\n");
 #endif
+
+    markRoots();
 
 #ifdef DEBUG_LOG_GC
     printf("-- gc end\n");

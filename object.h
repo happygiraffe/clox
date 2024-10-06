@@ -30,6 +30,7 @@ typedef enum ObjType
 struct Obj
 {
     ObjType type;
+    bool isMarked;
     struct Obj *next; // linked list of all objects for GC
 };
 
