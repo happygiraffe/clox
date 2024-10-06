@@ -13,6 +13,9 @@
 /* When defined, stress test the garbage collector. */
 #define DEBUG_STRESS_GC
 
+/* When defined, log detailed garbage collector output. */
+#define DEBUG_LOG_GC
+
 #define UINT8_COUNT (UINT8_MAX + 1)
 
 #endif

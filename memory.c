@@ -4,6 +4,11 @@
 #include "memory.h"
 #include "vm.h"
 
+#ifdef DEBUG_LOG_GC
+#include <stdio.h>
+#include "debug.h"
+#endif
+
 void *reallocate(void *pointer, size_t oldSize, size_t newSize)
 {
     if (newSize > oldSize)
@@ -27,6 +32,10 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize)
 
 static void freeObject(Obj *object)
 {
+#ifdef DEBUG_LOG_GC
+    printf("%p free type %d\n", (void *)object, object->type);
+#endif
+
     switch (object->type)
     {
     case OBJ_CLOSURE:
@@ -63,6 +72,13 @@ static void freeObject(Obj *object)
 
 void collectGarbage()
 {
+#ifdef DEBUG_LOG_GC
+    printf("-- gc begin\n");
+#endif
+
+#ifdef DEBUG_LOG_GC
+    printf("-- gc end\n");
+#endif
 }
 
 void freeObjects()
