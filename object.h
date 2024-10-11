@@ -87,6 +87,7 @@ typedef struct ObjClass
 {
     Obj obj;
     ObjString *name;
+    Table methods;
 } ObjClass;
 
 typedef struct ObjInstance
