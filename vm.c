@@ -130,6 +130,7 @@ static bool callValue(Value callee, int argCount)
         case OBJ_BOUND_METHOD:
         {
             ObjBoundMethod *bound = AS_BOUND_METHOD(callee);
+            vm.stackTop[-argCount - 1] = bound->receiver; // "this"
             return call(bound->method, argCount);
         }
         case OBJ_CLASS:
