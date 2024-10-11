@@ -25,6 +25,7 @@ typedef struct VM
     Value *stackTop; /* where to push the next value */
     Table globals;
     Table strings;
+    ObjString *initString; // constructor^Winitializer name
     ObjUpvalue *openUpvalues;
 
     size_t bytesAllocated;

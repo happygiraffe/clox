@@ -224,6 +224,9 @@ static void markRoots()
 
     // Finally look in the compiler's usage.
     markCompilerRoots();
+
+    // Ooops, forgot our interned initializer name.
+    markObject((Obj *)vm.initString);
 }
 
 static void traceReferences()
