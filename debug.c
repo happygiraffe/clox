@@ -121,7 +121,7 @@ int disassembleInstruction(Chunk *chunk, int offset)
     {
         offset++;
         uint8_t constant = chunk->code[offset++];
-        printf("%-16s %4d", "OP_CLOSURE", constant);
+        printf("%-16s %4d ", "OP_CLOSURE", constant);
         printValue(chunk->constants.values[constant]);
         printf("\n");
         ObjFunction *function = AS_FUNCTION(chunk->constants.values[constant]);
@@ -131,6 +131,7 @@ int disassembleInstruction(Chunk *chunk, int offset)
             int index = chunk->code[offset++];
             printf("%04d | %s %d\n", offset - 2, isLocal ? "local" : "upvalue", index);
         }
+        return offset;
     }
     case OP_CLOSE_UPVALUE:
         return simpleInstruction("OP_CLOSE_UPVALUE", offset);
