@@ -95,6 +95,12 @@ static void blackenObject(Obj *object)
 
     switch (object->type)
     {
+    case OBJ_CLASS:
+    {
+        ObjClass *klass = (ObjClass *)object;
+        markObject((Obj *)klass->name);
+        break;
+    }
     case OBJ_CLOSURE:
     {
         ObjClosure *closure = (ObjClosure *)object;
@@ -129,6 +135,11 @@ static void freeObject(Obj *object)
 
     switch (object->type)
     {
+    case OBJ_CLASS:
+    {
+        FREE(ObjClass, object);
+        break;
+    }
     case OBJ_CLOSURE:
     {
         // Only free the closure itself: we don't own the referenced function.
