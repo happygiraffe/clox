@@ -445,6 +445,14 @@ static void concatenate()
             push(value);
             break;
         }
+        case OP_GET_SUPER:
+        {
+            ObjString *name = READ_STRING();
+            ObjClass *superclass = AS_CLASS(pop());
+            if (!bindMethod(superclass, name))
+                return INTERPRET_RUNTIME_ERROR;
+            break;
+        }
         case OP_EQUAL:
         {
             Value b = pop();
@@ -539,6 +547,18 @@ static void concatenate()
                 return INTERPRET_RUNTIME_ERROR;
             }
             // use the new call frame that invoke pushed onto the stack
+            frame = &vm.frames[vm.frameCount - 1];
+            break;
+        }
+        case OP_SUPER_INVOKE:
+        {
+            ObjString *method = READ_STRING();
+            int argCount = READ_BYTE();
+            ObjClass *superclass = AS_CLASS(pop());
+            if (!invokeFromClass(superclass, method, argCount))
+            {
+                return INTERPRET_RUNTIME_ERROR;
+            }
             frame = &vm.frames[vm.frameCount - 1];
             break;
         }
