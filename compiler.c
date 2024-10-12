@@ -833,6 +833,19 @@ static void classDeclaration()
     classCompiler.enclosing = currentClass;
     currentClass = &classCompiler; // hurrah for recursive descent!
 
+    // Derived classes.
+    if (match(TOKEN_LESS))
+    {
+        consume(TOKEN_IDENTIFIER, "Expect superclass name.");
+        variable(false);
+        if (identifiersEqual(&className, &parser.previous))
+        {
+            error("A class can't iherit from itself.");
+        }
+        namedVariable(className, false);
+        emitByte(OP_INHERIT);
+    }
+
     // Put the class name on the stack for methods to be associated with it.
     namedVariable(className, false);
     consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
