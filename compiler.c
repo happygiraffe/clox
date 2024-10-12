@@ -372,6 +372,14 @@ static void dot(bool canAssign)
         expression();
         emitBytes(OP_SET_PROPERTY, name);
     }
+    else if (match(TOKEN_LEFT_PAREN))
+    {
+        // fast path for method invocations: we know this is going to be called
+        // immediately so we can avoid heap allocation.
+        uint8_t argCount = argumentList();
+        emitBytes(OP_INVOKE, name);
+        emitByte(argCount);
+    }
     else
     {
         emitBytes(OP_GET_PROPERTY, name);

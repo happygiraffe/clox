@@ -175,6 +175,43 @@ static bool callValue(Value callee, int argCount)
     return false;
 }
 
+static bool invokeFromClass(ObjClass *klass, ObjString *name, int argCount)
+{
+    // ~OP_GET_PROPERTY
+    Value method;
+    if (!tableGet(&klass->methods, name, &method))
+    {
+        runtimeError("Undefined property '%s'.", name->chars);
+        return false;
+    }
+
+    // ~OP_CALL
+    return call(AS_CLOSURE(method), argCount);
+}
+
+static bool invoke(ObjString *name, int argCount)
+{
+    Value receiver = peek(argCount); // "this"
+    if (!IS_INSTANCE(receiver))
+    {
+        runtimeError("Only instances have methods.");
+        return false;
+    }
+
+    ObjInstance *instance = AS_INSTANCE(receiver);
+
+    // Check to see if there's a field with the same name. This can happen if we
+    // store a closure in a field.
+    Value value;
+    if (tableGet(&instance->fields, name, &value))
+    {
+        vm.stackTop[-argCount - 1] = value;
+        return callValue(value, argCount);
+    }
+
+    return invokeFromClass(instance->klass, name, argCount);
+}
+
 static bool bindMethod(ObjClass *klass, ObjString *name)
 {
     Value method;
@@ -490,6 +527,18 @@ static void concatenate()
             {
                 return INTERPRET_RUNTIME_ERROR;
             }
+            frame = &vm.frames[vm.frameCount - 1];
+            break;
+        }
+        case OP_INVOKE:
+        {
+            ObjString *method = READ_STRING();
+            int argCount = READ_BYTE();
+            if (!invoke(method, argCount))
+            {
+                return INTERPRET_RUNTIME_ERROR;
+            }
+            // use the new call frame that invoke pushed onto the stack
             frame = &vm.frames[vm.frameCount - 1];
             break;
         }
