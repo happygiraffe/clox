@@ -28,7 +28,7 @@ HDRS=\
 	vm.h
 
 clox: $(SRCS) $(HDRS)
-	cc $(OPTS) -o $@ $(SRCS)
+	c++ $(OPTS) -o $@ $(SRCS)
 
 clean:
 	rm -f clox

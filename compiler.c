@@ -866,8 +866,8 @@ static void classDeclaration()
     defineVariable(nameConstant);
 
     ClassCompiler classCompiler = {
-        .hasSuperclass = false,
         .enclosing = currentClass,
+        .hasSuperclass = false,
     };
     // hurrah for recursive descent! We know we can stack-allocate this.
     currentClass = &classCompiler;
