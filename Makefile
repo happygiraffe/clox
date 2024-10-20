@@ -2,19 +2,20 @@
 
 all: clox
 
-OPTS=-Wall -Werror
+CC=clang++-16
+OPTS=-std=c++20 -Wall -Werror
 
 SRCS=\
-	main.c \
-	chunk.c \
-	compiler.c \
-	debug.c \
-	memory.c \
-	object.c \
-	scanner.c \
-	table.c \
-	value.c \
-	vm.c
+	main.cc \
+	chunk.cc \
+	compiler.cc \
+	debug.cc \
+	memory.cc \
+	object.cc \
+	scanner.cc \
+	table.cc \
+	value.cc \
+	vm.cc
 HDRS=\
 	chunk.h \
 	common.h \
@@ -28,7 +29,7 @@ HDRS=\
 	vm.h
 
 clox: $(SRCS) $(HDRS)
-	c++ $(OPTS) -o $@ $(SRCS)
+	$(CC) $(OPTS) -o $@ $(SRCS)
 
 clean:
 	rm -f clox

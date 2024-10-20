@@ -51,7 +51,8 @@ typedef enum TokenType
 
     // The rest.
     TOKEN_ERROR,
-    TOKEN_EOF
+    TOKEN_EOF,
+    _TOKEN_MAX
 } TokenType;
 
 typedef struct Token

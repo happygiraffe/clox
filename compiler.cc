@@ -234,8 +234,11 @@ static void patchJump(int offset)
     currentChunk()->code[offset + 1] = jump & 0xff;
 }
 
+void initRules();
+
 static void initCompiler(Compiler *compiler, FunctionType type)
 {
+    initRules(); // TODO: dom - can use static initialization here?
     compiler->enclosing = current;
     compiler->function = NULL;
     compiler->type = type;
@@ -541,47 +544,50 @@ static void unary(bool canAssign)
     }
 }
 
-ParseRule rules[] = {
-    [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
-    [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
-    [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
-    [TOKEN_DOT] = {NULL, dot, PREC_CALL},
-    [TOKEN_MINUS] = {unary, binary, PREC_TERM},
-    [TOKEN_PLUS] = {NULL, binary, PREC_TERM},
-    [TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
-    [TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
-    [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
-    [TOKEN_BANG] = {unary, NULL, PREC_NONE},
-    [TOKEN_BANG_EQUAL] = {NULL, binary, PREC_EQUALITY},
-    [TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
-    [TOKEN_EQUAL_EQUAL] = {NULL, binary, PREC_EQUALITY},
-    [TOKEN_GREATER] = {NULL, binary, PREC_COMPARISON},
-    [TOKEN_GREATER_EQUAL] = {NULL, binary, PREC_COMPARISON},
-    [TOKEN_LESS] = {NULL, binary, PREC_COMPARISON},
-    [TOKEN_LESS_EQUAL] = {NULL, binary, PREC_COMPARISON},
-    [TOKEN_IDENTIFIER] = {variable, NULL, PREC_NONE},
-    [TOKEN_STRING] = {string, NULL, PREC_NONE},
-    [TOKEN_NUMBER] = {number, NULL, PREC_NONE},
-    [TOKEN_AND] = {NULL, and_, PREC_NONE},
-    [TOKEN_CLASS] = {NULL, NULL, PREC_NONE},
-    [TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_FALSE] = {literal, NULL, PREC_NONE},
-    [TOKEN_FOR] = {NULL, NULL, PREC_NONE},
-    [TOKEN_FUN] = {NULL, NULL, PREC_NONE},
-    [TOKEN_IF] = {NULL, NULL, PREC_NONE},
-    [TOKEN_NIL] = {literal, NULL, PREC_NONE},
-    [TOKEN_OR] = {NULL, or_, PREC_NONE},
-    [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
-    [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
-    [TOKEN_SUPER] = {super_, NULL, PREC_NONE},
-    [TOKEN_THIS] = {this_, NULL, PREC_NONE},
-    [TOKEN_TRUE] = {literal, NULL, PREC_NONE},
-    [TOKEN_VAR] = {NULL, NULL, PREC_NONE},
-    [TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
-    [TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
-    [TOKEN_EOF] = {NULL, NULL, PREC_NONE},
+ParseRule rules[_TOKEN_MAX];
+
+void initRules()
+{
+    rules[TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL};
+    rules[TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_COMMA] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_DOT] = {NULL, dot, PREC_CALL};
+    rules[TOKEN_MINUS] = {unary, binary, PREC_TERM};
+    rules[TOKEN_PLUS] = {NULL, binary, PREC_TERM};
+    rules[TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_SLASH] = {NULL, binary, PREC_FACTOR};
+    rules[TOKEN_STAR] = {NULL, binary, PREC_FACTOR};
+    rules[TOKEN_BANG] = {unary, NULL, PREC_NONE};
+    rules[TOKEN_BANG_EQUAL] = {NULL, binary, PREC_EQUALITY};
+    rules[TOKEN_EQUAL] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_EQUAL_EQUAL] = {NULL, binary, PREC_EQUALITY};
+    rules[TOKEN_GREATER] = {NULL, binary, PREC_COMPARISON};
+    rules[TOKEN_GREATER_EQUAL] = {NULL, binary, PREC_COMPARISON};
+    rules[TOKEN_LESS] = {NULL, binary, PREC_COMPARISON};
+    rules[TOKEN_LESS_EQUAL] = {NULL, binary, PREC_COMPARISON};
+    rules[TOKEN_IDENTIFIER] = {variable, NULL, PREC_NONE};
+    rules[TOKEN_STRING] = {string, NULL, PREC_NONE};
+    rules[TOKEN_NUMBER] = {number, NULL, PREC_NONE};
+    rules[TOKEN_AND] = {NULL, and_, PREC_NONE};
+    rules[TOKEN_CLASS] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_ELSE] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_FALSE] = {literal, NULL, PREC_NONE};
+    rules[TOKEN_FOR] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_FUN] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_IF] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_NIL] = {literal, NULL, PREC_NONE};
+    rules[TOKEN_OR] = {NULL, or_, PREC_NONE};
+    rules[TOKEN_PRINT] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_RETURN] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_SUPER] = {super_, NULL, PREC_NONE};
+    rules[TOKEN_THIS] = {this_, NULL, PREC_NONE};
+    rules[TOKEN_TRUE] = {literal, NULL, PREC_NONE};
+    rules[TOKEN_VAR] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_WHILE] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_ERROR] = {NULL, NULL, PREC_NONE};
+    rules[TOKEN_EOF] = {NULL, NULL, PREC_NONE};
 };
 
 static void parsePrecedence(Precedence precedence)
@@ -1144,10 +1150,10 @@ ObjFunction *compile(const char *source)
 
 void markCompilerRoots()
 {
-  Compiler *compiler = current;
-  while (compiler != NULL)
-  {
-    markObject((Obj *)compiler->function);
-    compiler = compiler->enclosing;
-  }
+    Compiler *compiler = current;
+    while (compiler != NULL)
+    {
+        markObject((Obj *)compiler->function);
+        compiler = compiler->enclosing;
+    }
 }
